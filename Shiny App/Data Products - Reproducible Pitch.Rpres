@@ -1,0 +1,51 @@
+Data Products - Reproducible Pitch
+========================================================
+author: astaines
+date: 1/3/2018
+autosize: true
+
+Overview
+========================================================
+
+This tool for exploring the Iris dataset was built for the Coursera Course Developing Data Products as part of the Data Science Specialization. The project was intended to test the following competencies: 
+- Ability to build a shiny web application 
+- Ability to build an R markdown presentation
+
+
+Data
+========================================================
+
+```{r}
+summary(iris)
+```
+
+Sepal Length & Width by Species
+========================================================
+
+```{r}
+library(ggplot2)
+g <- ggplot(iris, aes(x=Sepal.Length, y=Sepal.Width))+
+  geom_point(aes(color=Species))+
+  xlab("Sepal Length")+
+  ylab("Sepal Width")
+g
+```
+
+Petal Length & Width by Species
+========================================================
+
+```{r}
+g <- ggplot(iris, aes(x=Petal.Length, y=Petal.Width))+
+  geom_point(aes(color=Species))+
+  xlab("Petal Length")+
+  ylab("Petal Width")
+g
+```
+
+Application
+========================================================
+The shiny application developed for this assignment is available at:
+
+The source codes of ui.R and server.R available on GitHub repo at:
+
+

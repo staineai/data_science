@@ -1,0 +1,167 @@
+---
+title: "Practical Machine Learning Peer Assessment"
+author: "astaines"
+date: "December 29, 2017"
+output: 
+  html_document: 
+    keep_md: yes
+---
+## Introduction
+### Background
+Using devices such as Jawbone Up, Nike FuelBand, and Fitbit it is now possible to collect a large amount of data about personal activity relatively inexpensively. These type of devices are part of the quantified self movement - a group of enthusiasts who take measurements about themselves regularly to improve their health, to find patterns in their behavior, or because they are tech geeks. One thing that people regularly do is quantify how much of a particular activity they do, but they rarely quantify how well they do it. In this project, your goal will be to use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants. They were asked to perform barbell lifts correctly and incorrectly in 5 different ways. More information is available from the website here:   
+   
+http://web.archive.org/web/20161224072740/http:/groupware.les.inf.puc-rio.br/har (see the section on the Weight Lifting Exercise Dataset).
+
+### Data
+
+The training data for this project are available here:
+
+https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv
+
+The test data are available here:
+
+https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv
+
+
+The data for this project come from this source: http://web.archive.org/web/20161224072740/http:/groupware.les.inf.puc-rio.br/har
+
+### Environment set up
+```{r results='hide', warning=FALSE, message=FALSE}
+library(caret)
+library(rpart)
+library(rpart.plot)
+library(RColorBrewer)
+library(rattle)
+library(randomForest)
+library(corrplot)
+library(knitr)
+```
+
+### Loading in the data
+Next, we load in the data from the provided URLs:  
+```{r}
+trainUrl <- "http://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv"
+testUrl <- "http://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv"
+training <- read.csv(url(trainUrl), na.strings=c("NA","#DIV/0!",""))
+testing <- read.csv(url(testUrl), na.strings=c("NA","#DIV/0!",""))
+```
+
+Now, we partition the training data into training and testing sets. The training set will account for 70% of the data and the testing set will account for 30%. The original testing data will remain untouched.
+```{r}
+in_train <- createDataPartition(y=training$classe, p=0.6, list=FALSE)
+training_data <- training[in_train, ]; testing_data <- training[-in_train, ]
+dim(training_data); dim(testing_data)
+```
+
+### Cleaning the data
+First, we want to remove variables with near-zero variance: 
+```{r}
+NZV <- nearZeroVar(training_data)
+training_data <- training_data[, -NZV]; testing_data  <- testing_data[, -NZV]
+dim(training_data); dim(testing_data)
+```
+
+Then, we want to remove variables with a high percentage of NA values (95% or higher): 
+```{r}
+NAS   <- sapply(training_data, function(x) mean(is.na(x))) > 0.95
+training_data <- training_data[, NAS==FALSE]; testing_data  <- testing_data[, NAS==FALSE]
+dim(training_data); dim(testing_data)
+```
+
+Finally, we want to remove the ID variales, or the first 5 rows: 
+```{r}
+training_data <- training_data[, -(1:5)]; testing_data  <- testing_data[, -(1:5)]
+dim(training_data); dim(testing_data)
+```
+
+## Choosing a Model: 
+We will apply three methods for modeling this data: random forrest model, decision trees, and a generalized boosted model. The one with the highest accuracy will be used on the testing data set. 
+
+### Random Forrest Model: 
+```{r}
+set.seed(12345)
+random_forrest_control <- trainControl(method="cv", number=3, verboseIter=FALSE)
+random_forrest_model <- train(classe ~ ., data=training_data, method="rf",
+                          trControl=random_forrest_control)
+random_forrest_model$finalModel
+```
+
+Now, we will create a confusion matrix to test the accuracy of this model: 
+```{r}
+random_forrest_predict <- predict(random_forrest_model, newdata=testing_data)
+random_forrest_confusion <- confusionMatrix(random_forrest_predict, testing_data$classe)
+random_forrest_confusion
+```
+
+Finally, we will plot the confusion matrix results: 
+```{r}
+plot(random_forrest_confusion$table, col = random_forrest_confusion$byClass, main = paste("Random Forrest Confusion Matrix: Accuracy =", round(random_forrest_confusion$overall['Accuracy'], 4)))
+```
+
+### Decision Tree: 
+```{r}
+set.seed(12345)
+decision_tree_model <- rpart(classe ~ ., data=training_data, method="class")
+fancyRpartPlot(decision_tree_model)
+```
+
+Now, we will create a confusion matrix to test the accuracy of this model: 
+```{r}
+decision_tree_predict <- predict(decision_tree_model, testing_data, type = "class")
+decision_tree_confusion <- confusionMatrix(decision_tree_predict, testing_data$classe)
+decision_tree_confusion
+```
+
+Finally, we will plot the confusion matrix results: 
+```{r}
+plot(decision_tree_confusion$table, col = decision_tree_confusion$byClass, main = paste("Decision Tree Confusion Matrix: Accuracy =", round(decision_tree_confusion$overall['Accuracy'], 4)))
+```
+
+### Generalized Boosted Model: 
+```{r}
+set.seed(12345)
+GBM_control <- trainControl(method = "repeatedcv", number = 5, repeats = 1)
+GBM_model  <- train(classe ~ ., data=training_data, method = "gbm",
+                    trControl = GBM_control, verbose = FALSE)
+GBM_model$finalModel
+```
+
+Now, we will create a confusion matrix to test the accuracy of this model: 
+```{r}
+GBM_predict <- predict(GBM_model, newdata=testing_data)
+GBM_confusion <- confusionMatrix(GBM_predict, testing_data$classe)
+GBM_confusion
+```
+
+Finally, we will plot the confusion matrix results: 
+```{r}
+plot(GBM_confusion$table, col = GBM_confusion$byClass, main = paste("Generalized Boosted Model Confusion Matrix: Accuracy =", round(GBM_confusion$overall['Accuracy'], 4)))
+```
+
+
+## Conclusions
+The accuracy of the 3 modeling methods are:
+* Random Forest: 0.996
+* Decision Tree: 0.709
+* GBM: 0.987
+
+Therefore, we choose to appy the Random Forrest Model to the testing dataset: 
+```{r}
+final_predict <- predict(random_forrest_model, newdata=testing)
+final_predict
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
