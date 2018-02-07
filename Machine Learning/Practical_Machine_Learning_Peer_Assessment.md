@@ -8,6 +8,8 @@ output:
 ---
 ## Introduction
 ### Background
+This project was done as part of the Coursera Practical Machine Learning Course as part of the Data Science Specialization.
+
 Using devices such as Jawbone Up, Nike FuelBand, and Fitbit it is now possible to collect a large amount of data about personal activity relatively inexpensively. These type of devices are part of the quantified self movement - a group of enthusiasts who take measurements about themselves regularly to improve their health, to find patterns in their behavior, or because they are tech geeks. One thing that people regularly do is quantify how much of a particular activity they do, but they rarely quantify how well they do it. In this project, your goal will be to use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants. They were asked to perform barbell lifts correctly and incorrectly in 5 different ways. More information is available from the website here:   
    
 http://web.archive.org/web/20161224072740/http:/groupware.les.inf.puc-rio.br/har (see the section on the Weight Lifting Exercise Dataset).
@@ -74,11 +76,11 @@ dim(training_data); dim(testing_data)
 ```
 
 ```
-## [1] 11776   130
+## [1] 11776   131
 ```
 
 ```
-## [1] 7846  130
+## [1] 7846  131
 ```
 
 Then, we want to remove variables with a high percentage of NA values (95% or higher): 
@@ -133,14 +135,14 @@ random_forrest_model$finalModel
 ##                      Number of trees: 500
 ## No. of variables tried at each split: 27
 ## 
-##         OOB estimate of  error rate: 0.3%
+##         OOB estimate of  error rate: 0.31%
 ## Confusion matrix:
 ##      A    B    C    D    E class.error
 ## A 3348    0    0    0    0 0.000000000
-## B    9 2266    4    0    0 0.005704256
-## C    0    5 2046    3    0 0.003894839
-## D    0    0    6 1922    2 0.004145078
-## E    0    1    1    4 2159 0.002771363
+## B    5 2270    4    0    0 0.003949100
+## C    0    7 2045    2    0 0.004381694
+## D    0    0   13 1916    1 0.007253886
+## E    0    1    0    4 2160 0.002309469
 ```
 
 Now, we will create a confusion matrix to test the accuracy of this model: 
@@ -156,33 +158,33 @@ random_forrest_confusion
 ## 
 ##           Reference
 ## Prediction    A    B    C    D    E
-##          A 2231    6    0    0    0
-##          B    0 1511    0    0    0
-##          C    0    1 1368    9    0
-##          D    0    0    0 1277    5
-##          E    1    0    0    0 1437
+##          A 2231    2    0    0    0
+##          B    0 1509    4    0    0
+##          C    0    6 1364    4    0
+##          D    0    1    0 1281    0
+##          E    1    0    0    1 1442
 ## 
 ## Overall Statistics
 ##                                           
-##                Accuracy : 0.9972          
-##                  95% CI : (0.9958, 0.9982)
+##                Accuracy : 0.9976          
+##                  95% CI : (0.9962, 0.9985)
 ##     No Information Rate : 0.2845          
 ##     P-Value [Acc > NIR] : < 2.2e-16       
 ##                                           
-##                   Kappa : 0.9965          
+##                   Kappa : 0.9969          
 ##  Mcnemar's Test P-Value : NA              
 ## 
 ## Statistics by Class:
 ## 
 ##                      Class: A Class: B Class: C Class: D Class: E
-## Sensitivity            0.9996   0.9954   1.0000   0.9930   0.9965
-## Specificity            0.9989   1.0000   0.9985   0.9992   0.9998
-## Pos Pred Value         0.9973   1.0000   0.9927   0.9961   0.9993
-## Neg Pred Value         0.9998   0.9989   1.0000   0.9986   0.9992
+## Sensitivity            0.9996   0.9941   0.9971   0.9961   1.0000
+## Specificity            0.9996   0.9994   0.9985   0.9998   0.9997
+## Pos Pred Value         0.9991   0.9974   0.9927   0.9992   0.9986
+## Neg Pred Value         0.9998   0.9986   0.9994   0.9992   1.0000
 ## Prevalence             0.2845   0.1935   0.1744   0.1639   0.1838
-## Detection Rate         0.2843   0.1926   0.1744   0.1628   0.1832
-## Detection Prevalence   0.2851   0.1926   0.1756   0.1634   0.1833
-## Balanced Accuracy      0.9992   0.9977   0.9992   0.9961   0.9982
+## Detection Rate         0.2843   0.1923   0.1738   0.1633   0.1838
+## Detection Prevalence   0.2846   0.1928   0.1751   0.1634   0.1840
+## Balanced Accuracy      0.9996   0.9967   0.9978   0.9980   0.9998
 ```
 
 Finally, we will plot the confusion matrix results: 
@@ -216,33 +218,33 @@ decision_tree_confusion
 ## 
 ##           Reference
 ## Prediction    A    B    C    D    E
-##          A 2067  336   54  106   61
-##          B   64  856   48   39  100
-##          C   13  108 1100  185   85
-##          D   51   96   74  721   58
-##          E   37  122   92  235 1138
+##          A 1978  250   60   86   76
+##          B   90  894   49   93  150
+##          C   21   97 1101  185  139
+##          D  116  190   77  853  178
+##          E   27   87   81   69  899
 ## 
 ## Overall Statistics
 ##                                           
-##                Accuracy : 0.7497          
-##                  95% CI : (0.7399, 0.7592)
+##                Accuracy : 0.7297          
+##                  95% CI : (0.7197, 0.7395)
 ##     No Information Rate : 0.2845          
 ##     P-Value [Acc > NIR] : < 2.2e-16       
 ##                                           
-##                   Kappa : 0.6813          
+##                   Kappa : 0.6572          
 ##  Mcnemar's Test P-Value : < 2.2e-16       
 ## 
 ## Statistics by Class:
 ## 
 ##                      Class: A Class: B Class: C Class: D Class: E
-## Sensitivity            0.9261   0.5639   0.8041  0.56065   0.7892
-## Specificity            0.9008   0.9603   0.9396  0.95747   0.9241
-## Pos Pred Value         0.7877   0.7733   0.7378  0.72100   0.7007
-## Neg Pred Value         0.9684   0.9018   0.9578  0.91747   0.9511
-## Prevalence             0.2845   0.1935   0.1744  0.16391   0.1838
-## Detection Rate         0.2634   0.1091   0.1402  0.09189   0.1450
-## Detection Prevalence   0.3344   0.1411   0.1900  0.12745   0.2070
-## Balanced Accuracy      0.9134   0.7621   0.8719  0.75906   0.8566
+## Sensitivity            0.8862   0.5889   0.8048   0.6633   0.6234
+## Specificity            0.9159   0.9396   0.9318   0.9145   0.9588
+## Pos Pred Value         0.8073   0.7006   0.7135   0.6033   0.7730
+## Neg Pred Value         0.9529   0.9050   0.9576   0.9327   0.9187
+## Prevalence             0.2845   0.1935   0.1744   0.1639   0.1838
+## Detection Rate         0.2521   0.1139   0.1403   0.1087   0.1146
+## Detection Prevalence   0.3123   0.1626   0.1967   0.1802   0.1482
+## Balanced Accuracy      0.9011   0.7643   0.8683   0.7889   0.7911
 ```
 
 Finally, we will plot the confusion matrix results: 
@@ -308,7 +310,7 @@ GBM_model$finalModel
 ```
 ## A gradient boosted model with multinomial loss function.
 ## 150 iterations were performed.
-## There were 53 predictors of which 40 had non-zero influence.
+## There were 53 predictors of which 42 had non-zero influence.
 ```
 
 Now, we will create a confusion matrix to test the accuracy of this model: 
@@ -324,33 +326,33 @@ GBM_confusion
 ## 
 ##           Reference
 ## Prediction    A    B    C    D    E
-##          A 2219   14    0    0    0
-##          B   13 1490    9    7    5
-##          C    0   11 1350   22    2
-##          D    0    2    8 1255   12
-##          E    0    1    1    2 1423
+##          A 2222    8    0    0    0
+##          B   10 1490   25    9    2
+##          C    0   20 1340   18    2
+##          D    0    0    3 1258   14
+##          E    0    0    0    1 1424
 ## 
 ## Overall Statistics
 ##                                           
-##                Accuracy : 0.9861          
-##                  95% CI : (0.9833, 0.9886)
+##                Accuracy : 0.9857          
+##                  95% CI : (0.9828, 0.9882)
 ##     No Information Rate : 0.2845          
 ##     P-Value [Acc > NIR] : < 2.2e-16       
 ##                                           
-##                   Kappa : 0.9824          
+##                   Kappa : 0.9819          
 ##  Mcnemar's Test P-Value : NA              
 ## 
 ## Statistics by Class:
 ## 
 ##                      Class: A Class: B Class: C Class: D Class: E
-## Sensitivity            0.9942   0.9816   0.9868   0.9759   0.9868
-## Specificity            0.9975   0.9946   0.9946   0.9966   0.9994
-## Pos Pred Value         0.9937   0.9777   0.9747   0.9828   0.9972
-## Neg Pred Value         0.9977   0.9956   0.9972   0.9953   0.9970
+## Sensitivity            0.9955   0.9816   0.9795   0.9782   0.9875
+## Specificity            0.9986   0.9927   0.9938   0.9974   0.9998
+## Pos Pred Value         0.9964   0.9701   0.9710   0.9867   0.9993
+## Neg Pred Value         0.9982   0.9956   0.9957   0.9957   0.9972
 ## Prevalence             0.2845   0.1935   0.1744   0.1639   0.1838
-## Detection Rate         0.2828   0.1899   0.1721   0.1600   0.1814
-## Detection Prevalence   0.2846   0.1942   0.1765   0.1628   0.1819
-## Balanced Accuracy      0.9958   0.9881   0.9907   0.9863   0.9931
+## Detection Rate         0.2832   0.1899   0.1708   0.1603   0.1815
+## Detection Prevalence   0.2842   0.1958   0.1759   0.1625   0.1816
+## Balanced Accuracy      0.9970   0.9871   0.9867   0.9878   0.9937
 ```
 
 Finally, we will plot the confusion matrix results: 
